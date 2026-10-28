@@ -1,0 +1,679 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Planeador Perú 2026</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: a hero with a woven band, a "cordillera" of eight peaks (one per day, height = altitude), then the selected day's checklist. */
+:root{
+  --bg:#FAF7FF; --surface:#FFFFFF; --surface2:#F1ECFA; --ink:#20153A; --muted:#675B83; --line:#E2D9F2; --mix:#000;
+  --d1:#C2187F; --d2:#00857F; --d3:#F2A900; --d4:#6E3FCB; --d5:#1E8449; --d6:#1575C9; --d7:#D6401A; --d8:#D42A45;
+  --ok:#1E8449; --warn:#B36B00;
+  --font-display:'Bricolage Grotesque','Trebuchet MS',system-ui,sans-serif;
+  --font-body:'Figtree',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#130F24; --surface:#1E1836; --surface2:#2A2149; --ink:#F5F0FF; --muted:#B5A9D3; --line:#3B3064; --mix:#fff;
+  --ok:#5BD08A; --warn:#FFC35A; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#130F24; --surface:#1E1836; --surface2:#2A2149; --ink:#F5F0FF; --muted:#B5A9D3; --line:#3B3064; --mix:#fff;
+  --ok:#5BD08A; --warn:#FFC35A; color-scheme:dark;}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.5;
+  padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1040px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--d4);outline-offset:2px}
+:root[data-theme="dark"] :focus-visible{outline-color:#C9B3FF}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) :focus-visible{outline-color:#C9B3FF}}
+
+.d1{--c:var(--d1);--on:#fff}.d2{--c:var(--d2);--on:#fff}.d3{--c:var(--d3);--on:#2A1B00}.d4{--c:var(--d4);--on:#fff}
+.d5{--c:var(--d5);--on:#fff}.d6{--c:var(--d6);--on:#fff}.d7{--c:var(--d7);--on:#fff}.d8{--c:var(--d8);--on:#fff}
+.ctext{color:color-mix(in srgb,var(--c) 78%,var(--mix))}
+.tint{background:color-mix(in srgb,var(--c) 11%,var(--surface))}
+
+/* hero */
+.hero{background:var(--surface);border:1px solid var(--line);border-radius:28px;overflow:hidden}
+.band{display:block;width:100%;height:40px}
+.hero-in{padding:20px clamp(18px,4vw,36px) 24px;display:flex;flex-direction:column;gap:22px}
+.scene{position:relative;isolation:isolate;overflow:hidden;color:#fff;min-height:340px;display:flex;flex-direction:column;justify-content:flex-end;gap:14px;padding:26px clamp(18px,4vw,36px) 26px}
+.scene svg.bg{position:absolute;inset:0;width:100%;height:100%;z-index:-2}
+.scene::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(18,8,48,.62),rgba(18,8,48,.2) 65%,rgba(18,8,48,.05)),linear-gradient(0deg,rgba(18,8,48,.45),rgba(18,8,48,0) 55%)}
+@media (max-width:640px){.scene::after{background:linear-gradient(0deg,rgba(18,8,48,.7),rgba(18,8,48,.3))}}
+.scene .kicker,.scene .who{color:rgba(255,255,255,.9)}
+.scene h1{text-shadow:0 2px 24px rgba(18,8,48,.5)}
+.scene h1 span:nth-child(1){color:#FF6FC0}.scene h1 span:nth-child(2){color:#3EE0D0}.scene h1 span:nth-child(3){color:#B9A0FF}.scene h1 span:nth-child(4){color:#FFA25C}
+.scene h1 .yr{color:transparent;-webkit-text-stroke:2.5px #fff}
+.scene .route i{border-top-color:rgba(255,255,255,.7)}
+.clouds{animation:drift 40s ease-in-out infinite alternate}
+@keyframes drift{from{transform:translateX(-30px)}to{transform:translateX(40px)}}
+.kicker{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+h1{margin:4px 0 0;font-family:var(--font-display);font-weight:800;font-size:clamp(56px,14vw,112px);line-height:.92;letter-spacing:-.02em;text-wrap:balance}
+h1 span:nth-child(1){color:var(--d1)}h1 span:nth-child(2){color:var(--d2)}h1 span:nth-child(3){color:var(--d4)}h1 span:nth-child(4){color:var(--d6)}
+h1 .yr{color:transparent;-webkit-text-stroke:2.5px var(--ink);margin-left:.12em}
+.route{display:flex;flex-wrap:wrap;align-items:center;gap:8px 6px;font-weight:600}
+.route .stop{padding:4px 12px;border-radius:99px;background:var(--c);color:var(--on);font-size:13px;font-weight:700}
+.route i{width:22px;height:0;border-top:3px dotted var(--muted)}
+.who{color:var(--muted);font-size:14px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.stat{border-radius:20px;padding:14px 16px;display:flex;align-items:center;gap:14px;background:color-mix(in srgb,var(--c) 11%,var(--surface));border:1px solid color-mix(in srgb,var(--c) 30%,var(--line))}
+.stat b{font-family:var(--font-display);font-size:34px;line-height:1;font-weight:800}
+.stat small{display:block;color:var(--muted);font-size:13px;line-height:1.3;font-weight:500}
+.stat .lbl{font-weight:700;font-size:14px;color:var(--ink);display:block}
+.ring{width:62px;height:62px;flex:none;position:relative}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:8}
+.ring .tr{stroke:color-mix(in srgb,var(--c) 20%,var(--surface2))}
+.ring .fg{stroke:var(--c);stroke-linecap:round;transition:stroke-dashoffset .5s}
+.ring em{position:absolute;inset:0;display:grid;place-items:center;font-style:normal;font-weight:800;font-size:14px;font-family:var(--font-display)}
+
+/* tabs */
+.tabs{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.tab{border:2px solid var(--line);background:var(--surface);border-radius:99px;padding:9px 18px;font-weight:700;font-size:14px}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.tab .n{display:inline-block;min-width:22px;margin-left:6px;padding:0 6px;border-radius:99px;background:var(--d3);color:#2A1B00;font-size:12px;text-align:center}
+.sync{margin-left:auto;font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.sync::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--warn)}
+.sync.cloud::before{background:var(--ok)}
+
+/* cordillera */
+.cord{display:flex;align-items:flex-end;gap:6px;overflow-x:auto;padding:10px 2px 18px;scroll-snap-type:x proximity}
+.peak{flex:1 0 98px;scroll-snap-align:center;position:relative;border:0;background:none;padding:0;opacity:.62;transition:opacity .2s,transform .2s}
+.peak:hover,.peak[aria-pressed="true"]{opacity:1}
+.peak[aria-pressed="true"]{transform:translateY(-4px)}
+.peak .shape{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:1px;text-align:center;
+  padding:0 8px 10px;background:var(--c);color:var(--on);clip-path:polygon(0 100%,0 40%,50% 0,100% 40%,100% 100%)}
+.peak .pn{font-family:var(--font-display);font-weight:800;font-size:30px;line-height:1}
+.peak .pd{font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;opacity:.9}
+.peak .pl{font-size:12px;line-height:1.2;font-weight:600;min-height:29px;display:flex;align-items:center}
+.peak .pb{width:100%;height:5px;border-radius:9px;background:rgba(255,255,255,.35);overflow:hidden;margin-top:3px}
+.d3 .peak .pb,.peak.d3 .pb{background:rgba(0,0,0,.18)}
+.peak .pb i{display:block;height:100%;background:var(--on);border-radius:9px;transition:width .4s}
+.peak[aria-pressed="true"]::after{content:"";position:absolute;left:50%;bottom:-13px;margin-left:-8px;border:8px solid transparent;border-top-color:var(--c);border-bottom:0}
+.peak .hoy{position:absolute;top:30%;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);font-size:10px;font-weight:800;letter-spacing:.08em;padding:1px 7px;border-radius:99px;text-transform:uppercase}
+.peak .full{position:absolute;top:38%;right:14%;width:20px;height:20px;border-radius:50%;background:var(--on);color:var(--c);display:grid;place-items:center;font-size:12px;font-weight:800}
+
+/* day panel */
+.panel{display:flex;flex-direction:column;gap:16px}
+.dhead{position:relative;overflow:hidden;border-radius:26px;background:var(--c);color:var(--on);padding:26px clamp(18px,4vw,34px) 30px;display:flex;gap:20px;align-items:flex-end;flex-wrap:wrap}
+.dhead::after{content:"";position:absolute;right:-30px;bottom:0;width:min(60%,380px);height:78%;background:rgba(255,255,255,.16);clip-path:polygon(0 100%,38% 18%,52% 44%,70% 0,100% 100%);pointer-events:none}
+.d3 .dhead::after{background:rgba(0,0,0,.1)}
+.d7 .dhead::before{content:"";position:absolute;left:0;right:0;bottom:0;height:9px;background:linear-gradient(90deg,#E53935,#FB8C00,#FDD835,#43A047,#1E88E5,#5E35B1,#D81B60)}
+.dnum{font-family:var(--font-display);font-weight:800;font-size:clamp(80px,16vw,128px);line-height:.8;color:transparent;-webkit-text-stroke:3px var(--on);position:relative}
+.dtxt{position:relative;display:flex;flex-direction:column;gap:6px;min-width:0;flex:1 1 260px}
+.dtxt .when{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;opacity:.92}
+.dtxt h2{margin:0;font-family:var(--font-display);font-weight:800;font-size:clamp(26px,5vw,40px);line-height:1.05;text-wrap:balance}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:99px;padding:3px 11px;font-size:12.5px;font-weight:700;background:rgba(255,255,255,.22)}
+.d3 .chip{background:rgba(0,0,0,.12)}
+.dprog{position:relative;flex:0 0 150px;display:flex;flex-direction:column;gap:6px;font-weight:700;font-size:13px}
+.dprog .bar{height:10px;border-radius:99px;background:rgba(255,255,255,.3);overflow:hidden}
+.d3 .dprog .bar{background:rgba(0,0,0,.15)}
+.dprog .bar i{display:block;height:100%;background:var(--on);border-radius:99px;transition:width .4s}
+
+.note{border-radius:18px;padding:14px 18px;background:color-mix(in srgb,var(--c) 11%,var(--surface));border:1px solid color-mix(in srgb,var(--c) 32%,var(--line))}
+.note b{display:block;font-size:12px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:2px}
+.cols{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:820px){.cols{grid-template-columns:minmax(0,1fr)}}
+.sec{display:flex;flex-direction:column;gap:10px;min-width:0}
+.sec h3{margin:0;font-family:var(--font-display);font-size:20px;font-weight:700;display:flex;align-items:baseline;gap:10px}
+.sec h3 small{font-family:var(--font-body);font-size:13px;color:var(--muted);font-weight:600}
+
+.row{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:16px;background:var(--surface);border:1px solid var(--line);cursor:pointer;transition:background .2s,border-color .2s}
+.row:hover{border-color:color-mix(in srgb,var(--c) 60%,var(--line))}
+.row.done{background:color-mix(in srgb,var(--c) 13%,var(--surface));border-color:color-mix(in srgb,var(--c) 40%,var(--line))}
+.row .time{flex:none;width:54px;font-family:var(--font-display);font-weight:700;font-size:15px;padding-top:1px;font-variant-numeric:tabular-nums}
+.row .body{flex:1;min-width:0}
+.row .tt{font-weight:600;overflow-wrap:anywhere}
+.row .dd{font-size:13.5px;color:var(--muted);margin-top:1px}
+.row.done .tt{text-decoration:line-through;text-decoration-thickness:2px;text-decoration-color:color-mix(in srgb,var(--c) 70%,var(--surface));color:var(--muted)}
+.row .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.tag{font-size:11.5px;font-weight:700;border-radius:99px;padding:1px 9px;border:1.5px solid color-mix(in srgb,var(--c) 55%,var(--line));color:color-mix(in srgb,var(--c) 75%,var(--mix))}
+.tag.fill{background:var(--c);border-color:var(--c);color:var(--on)}
+.tag.opt{border-style:dashed}
+.task{border-style:dashed;border-width:2px}
+.task.done{border-style:solid}
+.pill{flex:none;align-self:center;font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;border-radius:99px;padding:3px 10px;border:2px solid var(--warn);color:var(--warn)}
+.task.done .pill{background:var(--ok);border-color:var(--ok);color:var(--bg)}
+
+input[type=checkbox]{appearance:none;-webkit-appearance:none;flex:none;width:26px;height:26px;margin:0;border-radius:9px;border:2.5px solid var(--c);background:var(--surface);position:relative;cursor:pointer;transition:background .15s}
+input[type=checkbox]:checked{background:var(--c)}
+input[type=checkbox]:checked::after{content:"";position:absolute;left:7px;top:2px;width:7px;height:13px;border:solid var(--on);border-width:0 3px 3px 0;transform:rotate(45deg)}
+.pop input[type=checkbox]{animation:pop .35s}
+@keyframes pop{0%{transform:scale(.7)}60%{transform:scale(1.25)}100%{transform:scale(1)}}
+
+textarea{width:100%;min-height:96px;resize:vertical;border-radius:16px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;padding:12px 14px}
+textarea:focus-visible{border-color:var(--c);outline:none}
+.navrow{display:flex;justify-content:space-between;gap:10px}
+.btn{border:2px solid var(--line);background:var(--surface);border-radius:99px;padding:9px 18px;font-weight:700;font-size:14px}
+.btn:hover{border-color:var(--ink)}
+.btn.solid{background:var(--c);border-color:var(--c);color:var(--on)}
+.btn:disabled{opacity:.35;cursor:default}
+
+/* pendientes */
+.cat{display:flex;flex-direction:column;gap:10px;padding:18px;border-radius:24px;background:color-mix(in srgb,var(--c) 8%,var(--surface));border:1px solid color-mix(in srgb,var(--c) 28%,var(--line))}
+.cat h3{margin:0;font-family:var(--font-display);font-size:21px;display:flex;align-items:center;gap:10px}
+.cat h3 .dot{width:14px;height:14px;border-radius:50%;background:var(--c)}
+.cat h3 small{margin-left:auto;font-family:var(--font-body);font-size:13px;color:var(--muted);font-weight:700}
+.tasks-grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr))}
+.daytag{font-size:11.5px;font-weight:800;border-radius:99px;padding:1px 9px;background:var(--dc);color:var(--don)}
+.tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.hint{color:var(--muted);font-size:14px}
+
+/* boarding passes */
+.passes{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(min(100%,440px),1fr))}
+.pass{display:grid;grid-template-columns:minmax(0,1fr) 150px;border-radius:22px;background:var(--surface);border:1px solid var(--line);position:relative}
+.pass.todo{border:2px dashed var(--c)}
+.pass .main{padding:0 0 14px;min-width:0;border-radius:22px 0 0 22px;overflow:hidden}
+.pass .top{background:var(--c);color:var(--on);padding:10px 16px;display:flex;justify-content:space-between;gap:10px;font-weight:800;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+.pass .legs{padding:10px 16px 0;display:flex;flex-direction:column;gap:8px}
+.leg{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center}
+.leg b{display:block;font-family:var(--font-display);font-size:24px;line-height:1;font-variant-numeric:tabular-nums}
+.leg small{color:var(--muted);font-size:12.5px;font-weight:600}
+.leg .mid{text-align:center;font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.05em}
+.leg .mid hr{border:0;border-top:3px dotted var(--c);margin:5px 0 0}
+.leg .r{text-align:right}
+.layover{font-size:12.5px;color:var(--muted);font-weight:600;padding:4px 10px;border-radius:99px;background:var(--surface2);align-self:flex-start}
+.pass .foot{padding:10px 16px 0;font-size:12.5px;color:var(--muted)}
+.pass .stub{border-left:2.5px dashed var(--line);padding:14px 12px;display:flex;flex-direction:column;gap:10px;justify-content:center;align-items:center;text-align:center;position:relative}
+.pass .stub::before,.pass .stub::after{content:"";position:absolute;left:-12px;width:22px;height:22px;border-radius:50%;background:var(--bg);border:1px solid var(--line)}
+.pass .stub::before{top:-11px;clip-path:inset(50% 0 0 0)}
+.pass .stub::after{bottom:-11px;clip-path:inset(0 0 50% 0)}
+.stub .who{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.code{font-family:var(--font-display);font-weight:800;font-size:22px;letter-spacing:.06em;border:0;background:none;padding:2px 8px;border-radius:10px;color:color-mix(in srgb,var(--c) 78%,var(--mix))}
+.code:hover{background:color-mix(in srgb,var(--c) 12%,var(--surface))}
+.stub .cp{font-size:11px;color:var(--muted)}
+@media (max-width:520px){
+  .pass{grid-template-columns:minmax(0,1fr)}
+  .pass .main{border-radius:22px 22px 0 0}
+  .pass .stub{border-left:0;border-top:2.5px dashed var(--line);flex-direction:row;flex-wrap:wrap;gap:6px 18px}
+  .pass .stub::before,.pass .stub::after{display:none}
+}
+
+/* hotels and tours */
+.sh{margin:6px 0 0;font-family:var(--font-display);font-size:24px;font-weight:800}
+.blk{display:flex;flex-direction:column;gap:14px}
+.info{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr))}
+.card{border-radius:22px;background:var(--surface);border:1px solid var(--line);overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.card .ctop{background:var(--c);color:var(--on);padding:10px 16px;display:flex;justify-content:space-between;gap:10px;font-weight:800;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+.card .cbody{padding:14px 16px 16px;display:flex;flex-direction:column;gap:12px}
+.card h4{margin:0;font-family:var(--font-display);font-size:19px;line-height:1.2;font-weight:700}
+.card .sub{color:var(--muted);font-size:13.5px}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px 14px}
+.kv div{min-width:0}
+.kv small{display:block;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.kv span{font-weight:600;overflow-wrap:anywhere}
+.lists{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.lists h5{margin:0 0 4px;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+.lists ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:3px;font-size:13.5px}
+.lists li{padding-left:18px;position:relative}
+.lists li::before{content:"";position:absolute;left:2px;top:.5em;width:8px;height:8px;border-radius:50%;background:var(--c)}
+.lists .no li::before{background:none;border:2px solid var(--muted)}
+.callout{font-size:13.5px;border-radius:12px;padding:8px 12px;background:color-mix(in srgb,var(--d3) 22%,var(--surface))}
+.codeline{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.codeline small{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+
+.foot2{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center;color:var(--muted);font-size:13px}
+.reset{border:0;background:none;text-decoration:underline;color:var(--muted);font-size:13px;padding:4px}
+.confirm{display:flex;gap:8px;align-items:center}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:99px;font-weight:700;font-size:14px;opacity:0;pointer-events:none;transition:.3s;z-index:30;max-width:calc(100vw - 32px);text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:20}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap" id="app">
+  <header class="hero" id="hero"></header>
+  <nav class="tabs" id="tabs" role="tablist"></nav>
+  <main id="view"></main>
+  <footer class="foot2" id="foot"></footer>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<canvas id="fx" aria-hidden="true"></canvas>
+
+<script>
+(function(){
+"use strict";
+var DAYS=[
+{n:1,dow:"Jueves",date:"19 nov",short:"Cali → Lima",title:"Cali a Lima",place:"Vuelo internacional",alt:154,altTxt:"Lima ≈ 154 m",
+ note:"Verifica los documentos de viaje y las condiciones del equipaje antes de salir.",
+ acts:[
+ {id:"a1_1",t:"07:30",h:"Salir al aeropuerto Alfonso Bonilla Aragón",d:"Llega con tiempo para el registro, la documentación y los controles migratorios y de seguridad."},
+ {id:"a1_2",t:"11:00",h:"Vuelo Cali → Bogotá",d:"11:00 – 12:05 · Airbus A320",f:"AV8522"},
+ {id:"a1_3",t:"12:05",h:"Escala en Bogotá",d:"1 h 40 min de espera"},
+ {id:"a1_4",t:"13:45",h:"Vuelo Bogotá → Lima",d:"13:45 – 16:50 · Airbus A320neo",f:"AV053"},
+ {id:"a1_5",t:"16:50",h:"Llegada a Lima",d:"Migración, equipaje y traslado al hotel."},
+ {id:"a1_6",t:"",h:"Check-in en Miraflores y descanso",d:"Check-in desde las 15:00. Prepara el día siguiente."}]},
+{n:2,dow:"Viernes",date:"20 nov",short:"Lima",title:"Recorrido por Lima",place:"Miraflores y centro histórico",alt:154,altTxt:"Lima ≈ 154 m",
+ note:"Mantén una jornada flexible para descansar del viaje internacional y disfrutar de los principales atractivos.",
+ acts:[
+ {id:"a2_1",h:"Conocer Miraflores"},
+ {id:"a2_2",h:"Malecón con vistas al océano Pacífico"},
+ {id:"a2_3",h:"Parque del Amor"},
+ {id:"a2_4",h:"Circuito Mágico del Agua"},
+ {id:"a2_5",h:"Larcomar"},
+ {id:"a2_6",h:"Catacumbas"},
+ {id:"a2_7",h:"Centro histórico de Lima"},
+ {id:"a2_8",h:"Disfrutar la gastronomía peruana"},
+ {id:"a2_9",h:"Probar el pisco peruano",d:"En un establecimiento autorizado."}]},
+{n:3,dow:"Sábado",date:"21 nov",short:"Ballestas · Huacachina",title:"Islas Ballestas y Huacachina",place:"Paracas e Ica",alt:406,altTxt:"Ica ≈ 406 m",
+ note:"El tour sale a las 4:00 a. m. y regresa hacia las 10:00 p. m. Mañana hay vuelo a Cusco, así que deja la maleta lista.",
+ acts:[
+ {id:"a3_1",h:"Salida temprana desde Lima"},
+ {id:"a3_2",h:"Islas Ballestas, en Paracas"},
+ {id:"a3_3",h:"Traslado a Ica"},
+ {id:"a3_4",h:"Oasis de Huacachina"},
+ {id:"a3_5",h:"Recorrido en buggy por las dunas"},
+ {id:"a3_6",h:"Sandboard"},
+ {id:"a3_7",h:"Atardecer en el desierto",d:"Sunset sobre las dunas."},
+ {id:"a3_8",h:"Regreso a Lima"}]},
+{n:4,dow:"Domingo",date:"22 nov",short:"Lima → Cusco",title:"Vuelo a Cusco",place:"Primer día en la altura",alt:3399,altTxt:"Cusco ≈ 3.399 m",
+ note:"Elige las visitas según el tiempo disponible y cómo te sientas con la altura.",
+ acts:[
+ {id:"a4_1",t:"08:00",h:"Llegar al aeropuerto de Lima",d:"Registro, documentación, equipaje y sala de embarque."},
+ {id:"a4_2",t:"09:35",h:"Vuelo Lima → Cusco",d:"Directo · 1 h 20 min",f:"JA7021"},
+ {id:"a4_3",t:"10:55",h:"Llegada a Cusco",d:"Traslado a Casa Colonial. Check-in desde las 12:00."},
+ {id:"a4_4",t:"",h:"Almorzar y descansar"},
+ {id:"a4_5",t:"",h:"Plaza de Armas de Cusco"},
+ {id:"a4_6",t:"",h:"Borreguitos"},
+ {id:"a4_7",t:"",h:"Templo del Sol o Qorikancha"},
+ {id:"a4_8",t:"",h:"Puca Pucará y Valle Sagrado",d:"Solo si el tiempo y las condiciones físicas lo permiten.",o:1}]},
+{n:5,dow:"Lunes",date:"23 nov",short:"Machu Picchu",title:"Machu Picchu",place:"Ingreso a las 12:00 p. m.",alt:2430,altTxt:"Machu Picchu ≈ 2.430 m",
+ note:"Compra los tiquetes de tren según la hora de ingreso de las 12:00 p. m. y el tiempo de todos los desplazamientos.",
+ acts:[
+ {id:"a5_1",h:"Salir con anticipación hacia la estación de tren",d:"La estación debe estar confirmada."},
+ {id:"a5_2",h:"Tren a Machu Picchu Pueblo (Aguas Calientes)"},
+ {id:"a5_3",h:"Traslado al acceso del sitio arqueológico",d:"Según las indicaciones de la reserva."},
+ {id:"a5_4",t:"12:00",h:"Ingreso a Machu Picchu",d:"Ruta 1-B (terraza superior) · Circuito 1 (panorámico)."},
+ {id:"a5_5",h:"Recorrido autorizado"},
+ {id:"a5_6",h:"Regreso a Machu Picchu Pueblo"},
+ {id:"a5_7",h:"Tren de retorno a Cusco",d:"Según el horario comprado."}]},
+{n:6,dow:"Martes",date:"24 nov",short:"Laguna Humantay",title:"Laguna Humantay",place:"Soraypampa",alt:4200,altTxt:"Humantay ≈ 4.200 m",
+ note:"Es una caminata exigente: 2 horas por tramo y hasta 4.200 m. El tour incluye oxígeno y bastón.",
+ acts:[
+ {id:"b6_1",t:"04:30",h:"Recojo y salida de madrugada desde Cusco",d:"Desayuno incluido."},
+ {id:"b6_2",t:"",h:"Traslado a Soraypampa"},
+ {id:"b6_3",t:"",h:"Caminata hasta la Laguna Humantay",d:"Unas 2 horas de subida."},
+ {id:"b6_4",t:"",h:"Tiempo para disfrutar el paisaje y las fotos"},
+ {id:"b6_5",t:"",h:"Almuerzo incluido"},
+ {id:"b6_6",t:"17:00",h:"Regreso a Cusco",d:"Descansa: mañana es otro día largo."}]},
+{n:7,dow:"Miércoles",date:"25 nov",short:"7 Colores · Cusco → Lima",title:"Montaña de los 7 Colores y regreso a Lima",place:"Vinicunca y vuelo nocturno",alt:5200,altTxt:"Vinicunca ≈ 5.200 m",
+ note:"El check-out en Cusco es a las 10:00 y el tour regresa a las 17:00: pide guardar las maletas. Considera la altitud y el esfuerzo físico.",
+ acts:[
+ {id:"b7_0",t:"",h:"Dejar las maletas guardadas en Casa Colonial",d:"Check-out a las 10:00, el tour vuelve a las 17:00."},
+ {id:"b7_1",t:"04:30",h:"Recojo y salida de madrugada desde Cusco",d:"Desayuno incluido."},
+ {id:"b7_2",t:"",h:"Traslado al punto de inicio de la caminata"},
+ {id:"b7_3",t:"",h:"Caminata hasta la Montaña de los 7 Colores (Vinicunca)",d:"1 hora por tramo."},
+ {id:"b7_4",t:"",h:"Paisaje y fotografías"},
+ {id:"b7_5",t:"17:00",h:"Regreso a Cusco y descanso",d:"Recoge las maletas."},
+ {id:"b7_6",t:"20:00",h:"Traslado al aeropuerto de Cusco"},
+ {id:"b7_7",t:"21:30",h:"Vuelo Cusco → Lima",d:"21:30 – 23:10 · Directo",f:"JA7034"},
+ {id:"b7_8",t:"23:10",h:"Llegada a Lima y traslado al hotel en Callao",d:"Check-in tardío, avisa al anfitrión."}]},
+{n:8,dow:"Jueves",date:"26 nov",short:"Lima → Cali",title:"Regreso a Cali",place:"Lima, Bogotá y Cali",alt:154,altTxt:"Lima ≈ 154 m",
+ note:"Ajusta la hora de recogida si hay retrasos en los vuelos o demoras con el equipaje.",
+ acts:[
+ {id:"a8_1",t:"08:00",h:"Presentarse en el aeropuerto de Lima",d:"Registro, documentación, controles y puerta de embarque."},
+ {id:"a8_2",t:"11:45",h:"Vuelo Lima → Bogotá",d:"11:45 – 15:00 · Airbus A320neo",f:"AV050"},
+ {id:"a8_3",t:"15:00",h:"Escala en Bogotá",d:"1 h 45 min de espera"},
+ {id:"a8_4",t:"16:45",h:"Vuelo Bogotá → Cali",d:"16:45 – 17:55 · Airbus A320",f:"AV9201"},
+ {id:"a8_5",t:"18:30",h:"Llegada prevista a Cali",d:"El vuelo aterriza a las 17:55. Recogida en el Aeropuerto Alfonso Bonilla Aragón."}]}
+];
+var CATS=[
+ {k:"vuelos",name:"Vuelos y equipaje",c:6},
+ {k:"hotel",name:"Alojamiento",c:4},
+ {k:"tours",name:"Tours y entradas",c:3},
+ {k:"docs",name:"Documentación y logística",c:2}];
+var TASKS=[
+ {id:"t_tix",cat:"vuelos",day:1,h:"Verificar los tiquetes internacionales y la reserva ATSAGC"},
+ {id:"t_eq",cat:"vuelos",day:1,h:"Confirmar el equipaje de ambos viajeros"},
+ {id:"t_limcus",cat:"vuelos",day:4,h:"Comprar o confirmar el vuelo Lima – Cusco del 22 de noviembre"},
+ {id:"t_maleta",cat:"vuelos",day:4,h:"Comprar la maleta de mano para Lorena",d:"Primero verifica las condiciones de su reserva."},
+ {id:"t_cuslim",cat:"vuelos",day:7,h:"Vuelo Cusco – Lima del 25 de noviembre",d:"JA7034 · 21:30 – 23:10."},
+ {id:"t_conex",cat:"vuelos",day:7,h:"Confirmar que el vuelo del 25 deje llegar con tiempo al vuelo internacional del 26",d:"Llegan a Lima a las 23:10 y el vuelo sale a las 11:45."},
+ {id:"h_lima1",cat:"hotel",day:1,h:"Hotel en Lima del 19 al 22 de noviembre",d:"Miraflores · código HMWFT552JW."},
+ {id:"h_cusco",cat:"hotel",day:4,h:"Hotel en Cusco las noches del 22, 23 y 24",d:"Casa Colonial · código HMBXN58PC4."},
+ {id:"h_lima25",cat:"hotel",day:7,h:"Alojamiento de la noche del 25 en Lima",d:"Cerca del aeropuerto, Callao · código HMEWJ5YSM4."},
+ {id:"h_aviso",cat:"hotel",day:7,h:"Avisar a Benjamin, el anfitrión en Callao, que llegan tarde",d:"El check-in es desde las 15:00 y llegan después de las 23:10."},
+ {id:"x_bal",cat:"tours",day:3,p:1,h:"Tour de Islas Ballestas y Huacachina",d:"Comprado · S/285 o USD 75 por persona. Sale 04:00 y regresa 22:00."},
+ {id:"x_comp",cat:"tours",day:5,p:1,h:"Comparar PeruRail e Inca Rail"},
+ {id:"x_tren",cat:"tours",day:5,p:1,h:"Comprar los tiquetes de tren de ida y regreso"},
+ {id:"x_hor",cat:"tours",day:5,p:1,h:"Confirmar estación de salida, horarios y tiempos de traslado"},
+ {id:"x_mp",cat:"tours",day:5,p:1,h:"Verificar los boletos de Machu Picchu para ambos viajeros",d:"23 de noviembre, 12:00 p. m. · Ruta 1-B y Circuito 1."},
+ {id:"x_bus",cat:"tours",day:5,p:1,h:"Confirmar si el bus Machu Picchu Pueblo – sitio se compra aparte"},
+ {id:"x_hum",cat:"tours",day:6,h:"Tour a la Laguna Humantay",d:"Comprado · S/105 o USD 30 por persona. Falta el boleto de ingreso en el sitio (S/24) y confirmar dónde los recogen."},
+ {id:"x_7c",cat:"tours",day:7,h:"Tour a la Montaña de los 7 Colores",d:"Comprado · S/105 o USD 30 por persona. Falta el boleto de ingreso en el sitio (S/25) y confirmar dónde los recogen."},
+ {id:"d_pas",cat:"docs",day:1,h:"Verificar pasaportes y requisitos migratorios vigentes para Perú"},
+ {id:"d_eq",cat:"docs",day:1,h:"Revisar las condiciones de equipaje de las aerolíneas"},
+ {id:"d_trans",cat:"docs",day:8,h:"Avisar al encargado del transporte (SLP) la fecha y hora de llegada a Cali",d:"Confirma punto de encuentro y número de contacto."}];
+
+var HOTELS=[
+ {day:1,c:1,name:"Habitación con baño privado, cerca del Parque Kennedy",city:"Miraflores, Lima",inn:"Jue 19 nov · 15:00",out:"Dom 22 nov · 11:00",nights:"3 noches",addr:"Calle General Recavarren 181, Dpto 705, Miraflores, Lima 15074",host:"Angela",code:"HMWFT552JW"},
+ {day:4,c:4,name:"Casa Colonial, habitación 29",city:"Cusco",inn:"Dom 22 nov · 12:00",out:"Mié 25 nov · 10:00",nights:"3 noches",addr:"Calle Arequipa 251, habitación 29, Cusco 08000",host:"Carla",code:"HMBXN58PC4"},
+ {day:7,c:7,name:"Habitación privada moderna cerca del aeropuerto",city:"Callao, Lima",inn:"Mié 25 nov · 15:00",out:"Jue 26 nov · 11:00",nights:"1 noche",addr:"Callao, Lima",host:"Benjamin",code:"HMEWJ5YSM4",late:"Llegan después de las 23:10. Avisa al anfitrión."}];
+var TOURS=[
+ {day:3,c:3,name:"Islas Ballestas y Huacachina",hor:"04:00 – 22:00",price:"S/285 o USD 75 por persona",diff:"Fácil",pick:"Parque Kennedy u hotel en Miraflores",
+  inc:["Recojo en hotel en Miraflores","Bus turístico","Guía profesional","Buggies y sandboard","Degustación de vinos y pisco peruanos","Boleto de ingreso","Asistencia permanente"],
+  exc:["Alimentos no mencionados","Gastos extra"],extra:"9 puntos de recorrido"},
+ {day:6,c:6,name:"Laguna Humantay",hor:"04:30 – 17:00",price:"S/105 o USD 30 por persona",diff:"Agotador",alt:"3.400 – 4.200 m",walk:"2 horas por tramo",
+  pick:"Hotel cercano a la Plaza de Armas (1 o 2 cuadras). El folleto también dice que se recoge en oficina física: confírmalo con la agencia.",
+  inc:["Recojo en hotel","Minibús turístico","Desayuno","Almuerzo variado","Guía profesional","Oxígeno","Bastón","Bolsita feliz","Asistencia permanente"],
+  exc:["Alimentos no mencionados","Gastos extra","Boleto de ingreso: S/24 extranjeros"],extra:"3 puntos de recorrido"},
+ {day:7,c:7,name:"Montaña de Colores clásico",hor:"04:30 – 17:00",price:"S/105 o USD 30 por persona",diff:"Moderado",alt:"3.400 – 5.200 m",walk:"1 hora por tramo",
+  pick:"Hotel cercano a la Plaza de Armas (1 o 2 cuadras). El folleto también dice que se recoge en oficina física: confírmalo con la agencia.",
+  inc:["Recojo en hotel","Minibús turístico","Desayuno","Almuerzo variado","Guía profesional","Oxígeno","Bastón","Bolsita feliz","Asistencia permanente"],
+  exc:["Alimentos no mencionados","Gastos extra","Boleto de ingreso: S/25 extranjeros"],extra:"3 puntos de recorrido"}];
+var SEED=3,SEED_DONE=["h_lima1","h_cusco","h_lima25","t_cuslim","x_bal","x_hum","x_7c"];
+var KEY="peru2026_v1";
+var S={done:{},notes:{},seed:0};
+var cur=0,tab="itin",hideDone=false,justToggled=null,resetAsk=false,sync="local";
+var TRIP_START=new Date(2026,10,19),TRIP_END=new Date(2026,10,26);
+
+function applySeed(){
+  if(S.seed===SEED)return false;
+  SEED_DONE.forEach(function(k){S.done[k]=true});S.seed=SEED;return true;
+}
+try{var raw=localStorage.getItem(KEY);if(raw){var p=JSON.parse(raw);S={done:p.done||{},notes:p.notes||{},seed:p.seed||0};}}catch(e){}
+applySeed();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
+
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function dayTasks(n){return TASKS.filter(function(t){return t.day===n})}
+function actStats(d){var t=d.acts.length,k=d.acts.filter(function(a){return S.done[a.id]}).length;return{t:t,k:k,p:t?k/t:0}}
+function totals(){var at=0,ak=0;DAYS.forEach(function(d){var s=actStats(d);at+=s.t;ak+=s.k});
+  var tk=TASKS.filter(function(t){return S.done[t.id]}).length;return{at:at,ak:ak,tt:TASKS.length,tk:tk}}
+function today0(){var n=new Date();return new Date(n.getFullYear(),n.getMonth(),n.getDate())}
+function tripDayIndex(){var t=today0();if(t<TRIP_START||t>TRIP_END)return -1;return Math.round((t-TRIP_START)/864e5)}
+
+/* persistence */
+var doc=null,timer=null,writing=false,again=false,migrated=false;
+function persist(){
+  try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
+  if(!doc)return;clearTimeout(timer);timer=setTimeout(flush,450);
+}
+function flush(){
+  timer=null;if(!doc)return;
+  if(writing){again=true;return}
+  writing=true;
+  doc.set({v:1,done:S.done,notes:S.notes,seed:S.seed}).then(function(){setSync("cloud")},function(){setSync("local")}).then(function(){
+    writing=false;if(again){again=false;flush()}});
+}
+function setSync(v){if(sync!==v){sync=v;renderTabs()}}
+function initDb(){
+  if(!window.claude||!window.claude.use)return;
+  window.claude.use("db").then(function(db){
+    if(!db)return;
+    doc=db.doc("trip/progress");
+    doc.onSnapshot(function(snap){
+      if(timer||writing)return;
+      if(!snap.exists){
+        if(!migrated){migrated=true;flush()}
+        return;
+      }
+      var d=snap.data()||{},ns={done:d.done||{},notes:d.notes||{},seed:d.seed||0};
+      setSync("cloud");
+      var old=JSON.stringify(S);S=ns;var seeded=applySeed();
+      if(JSON.stringify(S)!==old){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}renderAll()}
+      if(seeded)persist();
+    },function(){});
+  }).catch(function(){});
+}
+
+/* hero */
+function bandSvg(){
+  var x=0,s="";
+  for(var i=0;i<8;i++){x=i*40;
+    s+='<polygon points="'+(x+20)+',3 '+(x+37)+',20 '+(x+20)+',37 '+(x+3)+',20" style="fill:var(--d'+(i+1)+')"/>'+
+       '<polygon points="'+(x+20)+',11 '+(x+29)+',20 '+(x+20)+',29 '+(x+11)+',20" fill="rgba(255,255,255,.55)"/>'+
+       '<rect x="'+(x+18)+'" y="18" width="4" height="4" style="fill:var(--d'+(i+1)+')"/>';}
+  return '<svg class="band" aria-hidden="true"><defs><pattern id="wv" width="320" height="40" patternUnits="userSpaceOnUse">'+s+'</pattern></defs><rect width="100%" height="40" fill="url(#wv)"/></svg>';
+}
+/* Machu Picchu at sunrise, drawn as layered shapes. Key features sit in the right half so a narrow screen can crop to it. */
+function sceneSvg(){
+  var s='<svg class="bg" viewBox="0 0 1000 420" preserveAspectRatio="xMaxYMax slice" aria-hidden="true">'+
+   '<defs><linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1E1550"/><stop offset=".38" stop-color="#7A2A9A"/><stop offset=".68" stop-color="#E8508A"/><stop offset="1" stop-color="#FFB347"/></linearGradient>'+
+   '<radialGradient id="sn"><stop offset="0" stop-color="#FFF3B0"/><stop offset=".45" stop-color="#FFD166" stop-opacity=".75"/><stop offset="1" stop-color="#FFB347" stop-opacity="0"/></radialGradient>'+
+   '<linearGradient id="hp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3E9E6A"/><stop offset="1" stop-color="#14503E"/></linearGradient>'+
+   '<linearGradient id="ms" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#FFE3F0" stop-opacity=".7"/></linearGradient></defs>'+
+   '<rect width="1000" height="420" fill="url(#sk)"/>'+
+   '<circle cx="640" cy="200" r="150" fill="url(#sn)"/>'+
+   '<path d="M0 420V250L90 200 170 250 260 190 360 260 450 220 540 290V420Z" fill="#4A2E86" opacity=".75"/>'+
+   '<path d="M300 420 400 245 470 190 520 150 575 200 650 290 720 420Z" fill="#2F7F59"/>'+
+   '<path d="M470 190 520 150 575 200 540 215 505 205Z" fill="#8FD6A1" opacity=".55"/>'+
+   '<path d="M700 420 760 240 800 150 835 80 862 54 890 92 915 165 950 255 1000 330V420Z" fill="url(#hp)"/>'+
+   '<path d="M835 80 862 54 890 92 872 100 858 86 846 104Z" fill="#B9F0C2" opacity=".6"/>'+
+   '<path d="M862 54 890 92 915 165 950 255 920 230 900 170 876 110Z" fill="#0F3F33" opacity=".5"/>'+
+   '<ellipse cx="640" cy="330" rx="330" ry="38" fill="url(#ms)"/>';
+  var cols=["#5DBB6E","#47A35E"],i,l,r,y;
+  for(i=0;i<9;i++){y=300+i*13;l=560-i*30;r=700+i*34;
+    s+='<rect x="'+l+'" y="'+y+'" width="'+(r-l)+'" height="'+(420-y)+'" fill="'+cols[i%2]+'"/><rect x="'+l+'" y="'+y+'" width="'+(r-l)+'" height="3" fill="#EADFC6"/>';}
+  [[585,291],[612,291],[642,291],[672,291],[598,278],[655,278]].forEach(function(h){
+    s+='<rect x="'+h[0]+'" y="'+h[1]+'" width="18" height="9" fill="#DCCBA8"/><path d="M'+(h[0]-2)+' '+h[1]+'l11-7 11 7z" fill="#C77B3A"/>';});
+  s+='<path d="M0 420V380Q100 345 220 378 330 400 430 388V420Z" fill="#134A3A"/><path d="M780 420V396Q880 372 1000 392V420Z" fill="#134A3A"/>'+
+   '<g class="clouds" fill="#fff"><ellipse cx="300" cy="150" rx="90" ry="14" opacity=".28"/><ellipse cx="520" cy="110" rx="70" ry="10" opacity=".25"/><ellipse cx="760" cy="215" rx="110" ry="14" opacity=".3"/><ellipse cx="120" cy="230" rx="80" ry="12" opacity=".22"/></g></svg>';
+  return s;
+}
+function ring(c,k,t){
+  var r=26,L=2*Math.PI*r,off=L*(1-(t?k/t:0));
+  return '<div class="ring"><svg viewBox="0 0 64 64"><circle class="tr" cx="32" cy="32" r="'+r+'"/><circle class="fg" cx="32" cy="32" r="'+r+'" stroke-dasharray="'+L.toFixed(1)+'" stroke-dashoffset="'+off.toFixed(1)+'"/></svg><em>'+Math.round(t?100*k/t:0)+'%</em></div>';
+}
+function renderHero(){
+  var T=totals(),ti=tripDayIndex(),n,l,sub;
+  var t=today0(),diff=Math.round((TRIP_START-t)/864e5);
+  if(ti>=0){n="Día "+(ti+1);l="de 8 · ¡ya están en ruta!";}
+  else if(diff>0){n=String(diff);l=diff===1?"día para el viaje":"días para el viaje";}
+  else{n="¡Listo!";l="viaje completado";}
+  $("hero").innerHTML=bandSvg()+
+  '<div class="scene">'+sceneSvg()+'<div><div class="kicker">Vacaciones · 19 al 26 de noviembre</div>'+
+  '<h1 aria-label="Perú 2026"><span>P</span><span>E</span><span>R</span><span>Ú</span><span class="yr">2026</span></h1></div>'+
+  '<div class="route" aria-label="Ruta"><span class="stop d1">Cali</span><i></i><span class="stop d2">Lima</span><i></i><span class="stop d4">Cusco</span><i></i><span class="stop d7">Lima</span><i></i><span class="stop d8">Cali</span></div>'+
+  '<div class="who">Jairo y Lorena</div></div>'+
+  '<div class="hero-in"><div class="stats">'+
+   '<div class="stat d7"><b class="ctext">'+n+'</b><small>'+l+'</small></div>'+
+   '<div class="stat d2">'+ring("d2",T.ak,T.at)+'<div><span class="lbl">Actividades</span><small>'+T.ak+' de '+T.at+' realizadas</small></div></div>'+
+   '<div class="stat d3">'+ring("d3",T.tk,T.tt)+'<div><span class="lbl">Pendientes</span><small>'+T.tk+' de '+T.tt+' resueltos</small></div></div>'+
+  '</div></div>';
+}
+
+/* tabs */
+function renderTabs(){
+  var left=TASKS.length-totals().tk;
+  var items=[["itin","Itinerario"],["pend","Pendientes"],["vue","Vuelos y reservas"]];
+  $("tabs").innerHTML=items.map(function(it){
+    return '<button class="tab" role="tab" data-tab="'+it[0]+'" aria-selected="'+(tab===it[0])+'">'+it[1]+(it[0]==="pend"&&left?'<span class="n">'+left+'</span>':'')+'</button>';
+  }).join("")+'<span class="sync '+(sync==="cloud"?"cloud":"")+'">'+(sync==="cloud"?"Sincronizado":"Guardado en este dispositivo")+'</span>';
+}
+
+/* itinerary */
+function cord(){
+  var ti=tripDayIndex();
+  return '<div class="cord" id="cord" role="group" aria-label="Días del viaje">'+DAYS.map(function(d,i){
+    var s=actStats(d),h=Math.round(128+d.alt/5200*118);
+    return '<button class="peak d'+d.n+'" data-day="'+i+'" aria-pressed="'+(i===cur)+'" aria-label="Día '+d.n+', '+esc(d.short)+', '+s.k+' de '+s.t+' actividades">'+
+      '<div class="shape" style="height:'+h+'px">'+
+      (i===ti?'<span class="hoy">Hoy</span>':'')+(s.t&&s.k===s.t?'<span class="full">✓</span>':'')+
+      '<span class="pd">'+d.date+'</span><span class="pn">'+d.n+'</span><span class="pl">'+esc(d.short)+'</span>'+
+      '<span class="pb"><i style="width:'+Math.round(s.p*100)+'%"></i></span></div></button>';
+  }).join("")+'</div>';
+}
+function actRow(d,a,hasT){
+  var on=!!S.done[a.id];
+  return '<label class="row '+(on?"done":"")+(justToggled===a.id?" pop":"")+'">'+
+   '<input type="checkbox" data-id="'+a.id+'" '+(on?"checked":"")+'>'+
+   (hasT?'<span class="time">'+(a.t||"·")+'</span>':'')+
+   '<span class="body"><div class="tt">'+esc(a.h)+'</div>'+(a.d?'<div class="dd">'+esc(a.d)+'</div>':'')+
+   ((a.f||a.o)?'<div class="tags">'+(a.f?'<span class="tag fill">'+a.f+'</span>':'')+(a.o?'<span class="tag opt">Opcional</span>':'')+'</div>':'')+
+   '</span></label>';
+}
+function taskRow(t,showDay){
+  var on=!!S.done[t.id],dd=DAYS[t.day-1];
+  return '<label class="row task '+(on?"done":"")+(justToggled===t.id?" pop":"")+' d'+t.day+'">'+
+   '<input type="checkbox" data-id="'+t.id+'" '+(on?"checked":"")+'>'+
+   '<span class="body"><div class="tt">'+esc(t.h)+'</div>'+(t.d?'<div class="dd">'+esc(t.d)+'</div>':'')+
+   ((t.p||showDay)?'<div class="tags">'+(t.p?'<span class="tag fill" style="--c:var(--d7)">Prioritario</span>':'')+
+   (showDay?'<span class="daytag" style="--dc:var(--d'+t.day+');--don:'+(t.day===3?"#2A1B00":"#fff")+'">Día '+t.day+' · '+dd.date+'</span>':'')+'</div>':'')+
+   '</span><span class="pill">'+(on?"Listo":"Pendiente")+'</span></label>';
+}
+function stayCard(h){
+  return '<article class="card d'+h.c+'"><div class="ctop"><span>Reservado · '+esc(h.nights)+'</span><span>'+esc(h.city)+'</span></div><div class="cbody">'+
+   '<h4>'+esc(h.name)+'</h4>'+
+   '<div class="kv"><div><small>Llegada</small><span>'+esc(h.inn)+'</span></div><div><small>Salida</small><span>'+esc(h.out)+'</span></div>'+
+   '<div><small>Viajeros</small><span>2 viajeros</span></div><div><small>Anfitrión</small><span>'+esc(h.host)+'</span></div></div>'+
+   '<div class="sub">'+esc(h.addr)+'</div>'+(h.late?'<div class="callout">'+esc(h.late)+'</div>':'')+
+   '<div class="codeline"><small>Confirmación</small>'+code(h.code)+'</div></div></article>';
+}
+function tourCard(t){
+  function li(a){return a.map(function(x){return '<li>'+esc(x)+'</li>'}).join("")}
+  return '<article class="card d'+t.c+'"><div class="ctop"><span>Tour comprado · '+esc(t.diff)+'</span><span>'+esc(t.hor)+'</span></div><div class="cbody">'+
+   '<h4>'+esc(t.name)+'</h4>'+
+   '<div class="kv"><div><small>Precio</small><span>'+esc(t.price)+'</span></div>'+
+   (t.alt?'<div><small>Altura</small><span>'+esc(t.alt)+'</span></div>':'')+
+   (t.walk?'<div><small>Caminata</small><span>'+esc(t.walk)+'</span></div>':'')+
+   '<div><small>Recorrido</small><span>'+esc(t.extra)+'</span></div></div>'+
+   '<div class="sub"><b>Recojo:</b> '+esc(t.pick)+'</div>'+
+   '<div class="lists"><div><h5 class="ctext">Incluye</h5><ul>'+li(t.inc)+'</ul></div><div class="no"><h5>No incluye</h5><ul>'+li(t.exc)+'</ul></div></div></div></article>';
+}
+function dayInfo(n){
+  var a=HOTELS.filter(function(h){return h.day===n}).map(stayCard).concat(TOURS.filter(function(t){return t.day===n}).map(tourCard));
+  return a.length?'<div class="info">'+a.join("")+'</div>':'';
+}
+function dayPanel(){
+  var d=DAYS[cur],s=actStats(d),ts=dayTasks(d.n),hasT=d.acts.some(function(a){return a.t});
+  var tk=ts.filter(function(t){return S.done[t.id]}).length;
+  var ti=tripDayIndex();
+  return '<section class="panel d'+d.n+'">'+
+   '<div class="dhead"><div class="dnum" aria-hidden="true">'+d.n+'</div>'+
+    '<div class="dtxt"><span class="when">'+d.dow+' '+d.date+' de 2026'+(cur===ti?' · hoy':'')+'</span><h2>'+esc(d.title)+'</h2>'+
+    '<div class="chips"><span class="chip">'+esc(d.place)+'</span><span class="chip">Punto más alto: '+esc(d.altTxt)+'</span></div></div>'+
+    '<div class="dprog"><span>'+s.k+' de '+s.t+' actividades</span><div class="bar"><i style="width:'+Math.round(s.p*100)+'%"></i></div></div></div>'+
+   '<div class="note"><b class="ctext">Recomendación</b>'+esc(d.note)+'</div>'+
+   '<div class="cols"><div class="sec"><h3>Plan del día <small>marca lo que ya hicieron</small></h3>'+
+    d.acts.map(function(a){return actRow(d,a,hasT)}).join("")+'</div>'+
+   '<div class="sec">'+(ts.length?'<h3>Por resolver <small>'+tk+' de '+ts.length+'</small></h3>'+ts.map(function(t){return taskRow(t,false)}).join(""):'<h3>Por resolver</h3><p class="hint">Este día no tiene pendientes.</p>')+
+    '<h3 style="margin-top:8px">Mis notas</h3><textarea id="notes" data-day="'+d.n+'" placeholder="Hotel, hora del tour, número de contacto, lo que quieras recordar...">'+esc(S.notes["d"+d.n]||"")+'</textarea></div></div>'+
+   dayInfo(d.n)+
+   '<div class="navrow"><button class="btn" data-go="-1" '+(cur===0?"disabled":"")+'>← Día anterior</button><button class="btn solid" data-go="1" '+(cur===DAYS.length-1?"disabled":"")+'>Día siguiente →</button></div>'+
+  '</section>';
+}
+
+/* pendientes */
+function pendView(){
+  var T=totals(),left=T.tt-T.tk;
+  var h='<div style="display:flex;flex-direction:column;gap:16px"><div class="tools"><span class="hint">'+(left?'Te faltan <b>'+left+'</b> por resolver.':'¡Todo resuelto!')+'</span>'+
+   '<button class="btn" data-hide="1">'+(hideDone?"Mostrar los listos":"Ocultar los listos")+'</button></div><div class="tasks-grid">';
+  CATS.forEach(function(c){
+    var all=TASKS.filter(function(t){return t.cat===c.k}),k=all.filter(function(t){return S.done[t.id]}).length;
+    var show=all.filter(function(t){return !(hideDone&&S.done[t.id])});
+    if(!show.length)return;
+    h+='<section class="cat d'+c.c+'"><h3><span class="dot"></span>'+c.name+'<small>'+k+' de '+all.length+'</small></h3>'+
+       show.map(function(t){return taskRow(t,true)}).join("")+'</section>';
+  });
+  return h+'</div></div>';
+}
+
+/* vuelos */
+function legH(a,b,f,t1,t2,c1,c2){
+  return '<div class="leg"><div><b>'+t1+'</b><small>'+c1+'</small></div><div class="mid">'+f+'<hr></div><div class="r"><b>'+t2+'</b><small>'+c2+'</small></div></div>';
+}
+function code(c){return '<button class="code" data-copy="'+c+'" title="Copiar">'+c+'</button>'}
+function vueView(){
+  return '<div class="blk"><h2 class="sh">Vuelos</h2>'+flightsH()+
+   '<h2 class="sh">Alojamiento</h2><div class="info">'+HOTELS.map(stayCard).join("")+'</div>'+
+   '<h2 class="sh">Tours</h2><div class="info">'+TOURS.map(tourCard).join("")+'</div></div>';
+}
+function flightsH(){
+  return '<div class="passes">'+
+  '<article class="pass d1"><div class="main"><div class="top"><span>Ida · Avianca</span><span>Jue 19 nov</span></div><div class="legs">'+
+    legH(0,0,"AV8522","11:00","12:05","CLO · Cali","BOG · Bogotá")+
+    '<span class="layover">Escala en Bogotá · 1 h 40 min</span>'+
+    legH(0,0,"AV053","13:45","16:50","BOG · Bogotá","LIM · Lima")+
+   '</div><div class="foot">Airbus A320 y A320neo · 5 h 50 min en total</div></div>'+
+   '<div class="stub"><div><div class="who">Reserva</div>'+code("ATSAGC")+'<div class="cp">Toca para copiar</div></div></div></article>'+
+  '<article class="pass d4"><div class="main"><div class="top"><span>Lima a Cusco · JetSMART</span><span>Dom 22 nov</span></div><div class="legs">'+
+    legH(0,0,"JA7021","09:35","10:55","LIM · Lima","CUZ · Cusco")+
+   '</div><div class="foot">Vuelo directo · 1 h 20 min</div></div>'+
+   '<div class="stub"><div><div class="who">Jairo</div>'+code("L3M64Y")+'</div><div><div class="who">Lorena</div>'+code("P7ZG3P")+'</div></div></article>'+
+  '<article class="pass d7"><div class="main"><div class="top"><span>Cusco a Lima · JetSMART</span><span>Mié 25 nov</span></div><div class="legs">'+
+    legH(0,0,"JA7034","21:30","23:10","CUZ · Cusco","LIM · Lima")+
+   '</div><div class="foot">Vuelo directo · traslado al aeropuerto de Cusco a las 20:00</div></div>'+
+   '<div class="stub"><div class="who">Duerman en Callao</div></div></article>'+
+  '<article class="pass d8"><div class="main"><div class="top"><span>Regreso · Avianca</span><span>Jue 26 nov</span></div><div class="legs">'+
+    legH(0,0,"AV050","11:45","15:00","LIM · Lima","BOG · Bogotá")+
+    '<span class="layover">Escala en Bogotá · 1 h 45 min</span>'+
+    legH(0,0,"AV9201","16:45","17:55","BOG · Bogotá","CLO · Cali")+
+   '</div><div class="foot">Airbus A320neo y A320 · 6 h 10 min en total · presentarse a las 8:00 a. m.</div></div>'+
+   '<div class="stub"><div><div class="who">Reserva</div>'+code("ATSAGC")+'<div class="cp">Toca para copiar</div></div></div></article>'+
+  '</div>';
+}
+
+function renderView(){
+  var v=$("view"),cs=0,c=$("cord");if(c)cs=c.scrollLeft;
+  var ae=document.activeElement,fid=ae&&ae.dataset?ae.dataset.id:null;
+  if(tab==="itin")v.innerHTML=cord()+dayPanel();
+  else if(tab==="pend")v.innerHTML=pendView();
+  else v.innerHTML=vueView();
+  c=$("cord");if(c){c.scrollLeft=cs;}
+  if(fid){var el=v.querySelector('[data-id="'+fid+'"]');if(el)el.focus({preventScroll:true})}
+}
+function renderFoot(){
+  $("foot").innerHTML='<span>Tus marcas se guardan solas.</span>'+(resetAsk?
+   '<span class="confirm"><span>¿Borrar todo el progreso?</span><button class="btn" data-reset="yes">Sí, borrar</button><button class="btn" data-reset="no">Cancelar</button></span>':
+   '<button class="reset" data-reset="ask">Reiniciar progreso</button>');
+}
+function renderAll(){renderHero();renderTabs();renderView();renderFoot()}
+
+/* actions */
+function toast(m){var t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(function(){t.classList.remove("on")},2200)}
+function toggle(id,on){
+  var dayIdx=-1,before=false;
+  DAYS.forEach(function(d,i){if(d.acts.some(function(a){return a.id===id})){dayIdx=i;before=actStats(d).t===actStats(d).k}});
+  if(on)S.done[id]=true;else delete S.done[id];
+  justToggled=on?id:null;persist();renderAll();
+  if(on&&dayIdx>=0){var s=actStats(DAYS[dayIdx]);
+    if(s.k===s.t&&!before){confetti(dayIdx);var T=totals();toast(T.ak===T.at?"¡Viaje completo! Qué aventura":"¡Día "+DAYS[dayIdx].n+" completo!")}}
+}
+function copy(txt){
+  function fb(){var ta=document.createElement("textarea");ta.value=txt;document.body.appendChild(ta);ta.select();try{document.execCommand("copy")}catch(e){}ta.remove()}
+  try{navigator.clipboard.writeText(txt).then(function(){},fb)}catch(e){fb()}
+  toast("Copiado: "+txt);
+}
+var fxRun=false;
+function confetti(i){
+  if(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches)return;
+  var cv=$("fx"),ctx=cv.getContext("2d"),w=cv.width=innerWidth,h=cv.height=innerHeight;
+  var cols=[1,2,3,4,5,7,8].map(function(n){return getComputedStyle(document.documentElement).getPropertyValue("--d"+n).trim()});
+  var P=[];for(var k=0;k<140;k++)P.push({x:w/2+(Math.random()-.5)*w*.3,y:h*.55,vx:(Math.random()-.5)*12,vy:-Math.random()*14-4,r:Math.random()*6,s:4+Math.random()*6,c:cols[k%cols.length],a:1});
+  var f=0;fxRun=true;
+  (function step(){
+    ctx.clearRect(0,0,w,h);
+    P.forEach(function(p){p.vy+=.35;p.x+=p.vx;p.y+=p.vy;p.r+=.2;p.a=Math.max(0,1-f/90);
+      ctx.save();ctx.globalAlpha=p.a;ctx.translate(p.x,p.y);ctx.rotate(p.r);ctx.fillStyle=p.c;ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s*.55);ctx.restore()});
+    if(++f<95)requestAnimationFrame(step);else ctx.clearRect(0,0,w,h);
+  })();
+}
+
+document.addEventListener("click",function(e){
+  var el=e.target.closest("[data-tab],[data-day],[data-go],[data-copy],[data-hide],[data-reset]");if(!el)return;
+  if(el.dataset.tab){tab=el.dataset.tab;renderTabs();renderView()}
+  else if(el.dataset.day!==undefined){cur=+el.dataset.day;renderView();var c=$("cord"),b=c&&c.children[cur];if(b&&b.scrollIntoView)b.scrollIntoView({inline:"center",block:"nearest",behavior:"smooth"})}
+  else if(el.dataset.go){cur=Math.max(0,Math.min(DAYS.length-1,cur+(+el.dataset.go)));renderView();window.scrollTo({top:$("tabs").offsetTop-8,behavior:"smooth"})}
+  else if(el.dataset.copy)copy(el.dataset.copy);
+  else if(el.dataset.hide){hideDone=!hideDone;renderView()}
+  else if(el.dataset.reset){
+    var r=el.dataset.reset;
+    if(r==="ask")resetAsk=true;
+    else if(r==="no")resetAsk=false;
+    else{S={done:{},notes:{},seed:SEED};resetAsk=false;persist();renderAll();toast("Progreso reiniciado");return}
+    renderFoot();
+  }
+});
+document.addEventListener("change",function(e){var t=e.target;if(t.matches&&t.matches("input[type=checkbox][data-id]"))toggle(t.dataset.id,t.checked)});
+document.addEventListener("input",function(e){var t=e.target;if(t.id==="notes"){var k="d"+t.dataset.day;if(t.value)S.notes[k]=t.value;else delete S.notes[k];persist()}});
+
+var ti0=tripDayIndex();if(ti0>=0)cur=ti0;
+renderAll();initDb();
+})();
+</script>
+
+</body></html>
